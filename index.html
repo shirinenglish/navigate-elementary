@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Navigate Elementary · Homework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F7FB; --card:#fff; --ink:#1E2433; --muted:#6B7385; --line:#E3E8F0;
+  --ok:#1F9D63; --okbg:#E6F6EE; --bad:#D9443B; --badbg:#FDECEA;
+  --accent:#2F6FD6; --accentbg:#EAF1FC;
+  --r:16px;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:Nunito,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.5;-webkit-tap-highlight-color:transparent}
+button{font:inherit;cursor:pointer;color:inherit}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px 60px}
+header.top{background:var(--accent);color:#fff;padding:18px 0 22px;margin-bottom:18px}
+header.top .wrap{padding-bottom:0}
+.top h1{margin:0;font-size:24px;font-weight:800;letter-spacing:.2px}
+.top p{margin:2px 0 0;opacity:.9;font-size:15px}
+.back{background:rgba(255,255,255,.18);border:0;color:#fff;border-radius:999px;padding:6px 14px;font-weight:700;font-size:14px;margin-bottom:10px}
+.namebox{background:var(--card);border-radius:var(--r);padding:16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(20,30,60,.06)}
+.namebox label{font-weight:700;display:block;margin-bottom:6px}
+.namebox input{width:100%;font:inherit;padding:10px 12px;border:2px solid var(--line);border-radius:12px}
+.unitcard{display:block;width:100%;text-align:left;background:var(--card);border:0;border-radius:var(--r);padding:18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(20,30,60,.06);border-left:8px solid var(--c)}
+.unitcard .n{font-size:13px;font-weight:800;color:var(--c);text-transform:uppercase;letter-spacing:.8px}
+.unitcard h2{margin:2px 0 4px;font-size:22px}
+.unitcard .topics{color:var(--muted);font-size:15px}
+.bar{height:8px;background:var(--line);border-radius:99px;margin-top:12px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--c);border-radius:99px;transition:width .4s}
+.barlabel{font-size:13px;color:var(--muted);margin-top:4px}
+.tabs{position:sticky;top:0;z-index:5;background:var(--bg);display:grid;grid-template-columns:1.35fr 1fr 1fr 1fr;gap:6px;padding:10px 0}
+.tab{border:2px solid var(--line);background:var(--card);border-radius:999px;padding:8px 2px;font-weight:800;font-size:14px;white-space:nowrap}
+.tab.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.tab small{font-weight:600;opacity:.8}
+.card{background:var(--card);border-radius:var(--r);padding:18px;margin:14px 0;box-shadow:0 1px 3px rgba(20,30,60,.06)}
+.card h3{margin:0;font-size:19px}
+.card .ru{color:var(--muted);font-style:italic;font-size:14px;margin:2px 0 12px}
+.score{float:right;font-size:13px;font-weight:800;background:var(--accentbg);color:var(--accent);padding:3px 10px;border-radius:99px}
+.score:empty{display:none}
+.score.done{background:var(--okbg);color:var(--ok)}
+.item{padding:12px 0;border-top:1px solid var(--line)}
+.item:first-of-type{border-top:0}
+.q{margin-bottom:8px;font-weight:600}
+.q .num{color:var(--accent);font-weight:800;margin-right:6px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{border:2px solid var(--line);background:#fff;border-radius:12px;padding:8px 14px;font-weight:700;transition:transform .1s}
+.opt:active{transform:scale(.97)}
+.opt.ok{background:var(--okbg);border-color:var(--ok);color:var(--ok)}
+.opt.bad{background:var(--badbg);border-color:var(--bad);color:var(--bad);animation:shake .3s}
+.opt[disabled]{cursor:default}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.match{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.match .col{display:flex;flex-direction:column;gap:8px}
+.mbtn{border:2px solid var(--line);background:#fff;border-radius:12px;padding:10px;font-weight:700;min-height:48px}
+.mbtn.sel{border-color:var(--accent);background:var(--accentbg)}
+.mbtn.ok{background:var(--okbg);border-color:var(--ok);color:var(--ok);opacity:.7}
+.mbtn.bad{background:var(--badbg);border-color:var(--bad);animation:shake .3s}
+.typerow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.typerow input{font:inherit;font-weight:700;padding:8px 12px;border:2px solid var(--line);border-radius:12px;width:180px}
+.typerow input.ok{border-color:var(--ok);background:var(--okbg);color:var(--ok)}
+.typerow input.bad{border-color:var(--bad);background:var(--badbg)}
+.small{font-size:14px;border:0;background:var(--accentbg);color:var(--accent);border-radius:10px;padding:8px 12px;font-weight:700}
+.btn{border:0;background:var(--accent);color:#fff;border-radius:12px;padding:10px 18px;font-weight:800}
+.btn.ghost{background:var(--accentbg);color:var(--accent)}
+.fb{font-size:14px;font-weight:700;margin-top:6px}
+.fb.ok{color:var(--ok)} .fb.bad{color:var(--bad)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:2px solid var(--line);background:#fff;border-radius:12px;padding:8px 12px;font-weight:700}
+.chip.used{visibility:hidden}
+.chip.ok{background:var(--okbg);border-color:var(--ok);color:var(--ok)}
+.chip.bad{background:var(--badbg);border-color:var(--bad);animation:shake .3s}
+.answerline{min-height:52px;border:2px dashed var(--line);border-radius:12px;padding:6px;display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;align-items:center}
+.answerline .chip{padding:6px 10px}
+.orderlist{counter-reset:o;margin:0 0 10px;padding:0;list-style:none}
+.orderlist li{counter-increment:o;background:var(--okbg);color:var(--ok);font-weight:700;border-radius:10px;padding:8px 12px;margin-bottom:6px}
+.orderlist li::before{content:counter(o)". "}
+.caps{line-height:2.4}
+.cw{display:inline-block;border:0;background:none;padding:2px 1px;border-radius:8px;font-weight:600;font-size:18px}
+.cw.sel{background:var(--accentbg);color:var(--accent);text-decoration:underline}
+.cw.ok{background:var(--okbg);color:var(--ok)}
+.cw.miss{background:#FFF4D6;color:#A36A00}
+.cw.bad{background:var(--badbg);color:var(--bad)}
+.flash{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.fc{border:2px solid var(--line);background:#fff;border-radius:14px;padding:14px 10px;min-height:88px;font-weight:800;font-size:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.fc .back2{display:none;font-weight:600;color:var(--accent);font-size:15px}
+.fc.flip{background:var(--accentbg);border-color:var(--accent)}
+.fc.flip .front{font-size:13px;color:var(--muted)}
+.fc.flip .back2{display:block}
+.text{font-size:18px;line-height:1.7}
+.text h4{margin:0 0 6px;font-size:20px}
+.text p{margin:0 0 12px}
+.gl{border:0;background:none;padding:0;font:inherit;color:inherit;border-bottom:2px dotted var(--accent);cursor:help}
+.tip{display:inline-block;background:var(--ink);color:#fff;font-size:13px;font-weight:700;border-radius:8px;padding:1px 8px;margin:0 4px;vertical-align:middle}
+.model{background:#FBFAF4;border-left:5px solid var(--accent);border-radius:10px;padding:12px 14px;white-space:pre-line;font-size:17px}
+.model b{color:var(--accent)}
+details summary{cursor:pointer;font-weight:800;color:var(--accent);margin:8px 0}
+textarea{width:100%;min-height:200px;font:inherit;font-size:17px;padding:12px;border:2px solid var(--line);border-radius:12px;resize:vertical}
+.checks{list-style:none;padding:0;margin:10px 0}
+.checks li{padding:4px 0;font-weight:600;color:var(--muted)}
+.checks li::before{content:"○ ";font-weight:800}
+.checks li.on{color:var(--ok)}
+.checks li.on::before{content:"✓ "}
+.wc{font-weight:800}
+.tip-box{background:var(--accentbg);border-radius:12px;padding:10px 14px;font-size:15px;margin:8px 0}
+.svgclock{display:block;margin:4px 0 10px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:99px;font-weight:700;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9}
+.toast.show{opacity:1}
+footer{text-align:center;color:var(--muted);font-size:13px;margin-top:30px}
+.pages{font-size:13px;color:var(--muted)}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   CONTENT
+   In "choice" items the FIRST option is the correct one
+   (options are shuffled on screen).
+   ========================================================= */
+const UNITS = [
+{
+  id:"u1", n:1, title:"Your world", color:"#2F6FD6", pages:"Coursebook pages 6–15",
+  topics:"Countries & nationalities · Family · Plural nouns · Personal profile",
+  vocab:[
+    {type:"flash", id:"u1v0", title:"Word bank", ru:"Нажмите на слово, чтобы увидеть перевод.",
+     words:[["country","страна"],["nationality","национальность"],["language","язык"],["husband","муж"],["wife","жена"],["aunt","тётя"],["uncle","дядя"],["cousin","двоюродный брат / сестра"],["nephew","племянник"],["niece","племянница"],["grandson","внук"],["granddaughter","внучка"],["stepfather","отчим"],["brother-in-law","брат мужа / жены, муж сестры"],["twins","близнецы"],["married","женат / замужем"],["single","холост / не замужем"],["neighbour","сосед"]]},
+    {type:"match", id:"u1v1", title:"Countries and nationalities", ru:"Соедините страну и национальность.",
+     rounds:[
+      [["Japan","Japanese"],["Brazil","Brazilian"],["Spain","Spanish"],["Germany","German"],["Uzbekistan","Uzbek"],["the UK","British"]],
+      [["Turkey","Turkish"],["Mexico","Mexican"],["China","Chinese"],["Poland","Polish"],["the UAE","Emirati"],["Italy","Italian"]]
+     ]},
+    {type:"choice", id:"u1v2", title:"Family puzzle", ru:"Кто это? Выберите правильное слово.",
+     items:[
+      {q:"My mother's sister is my ___ .", o:["aunt","niece","cousin"]},
+      {q:"My father's father is my ___ .", o:["grandfather","uncle","stepfather"]},
+      {q:"My uncle's son is my ___ .", o:["cousin","nephew","brother"]},
+      {q:"My sister's daughter is my ___ .", o:["niece","aunt","granddaughter"]},
+      {q:"My wife's brother is my ___ .", o:["brother-in-law","stepbrother","uncle"]},
+      {q:"My mother's new husband (not my father) is my ___ .", o:["stepfather","grandfather","brother-in-law"]},
+      {q:"My son's son is my ___ .", o:["grandson","nephew","cousin"]},
+      {q:"My brother's son is my ___ .", o:["nephew","niece","grandson"]}
+     ]},
+    {type:"type", id:"u1v3", title:"One → many: plurals", ru:"Напишите множественное число.",
+     tip:"Most words: + s · -ch, -sh, -s, -x: + es · consonant + y → ies · -f / -fe → ves · Irregular: child → children",
+     items:[
+      {q:"one child → two …", a:["children"]},
+      {q:"one box → two …", a:["boxes"]},
+      {q:"one city → two …", a:["cities"]},
+      {q:"one wife → two …", a:["wives"]},
+      {q:"one person → two …", a:["people"]},
+      {q:"one man → two …", a:["men"]},
+      {q:"one bus → two …", a:["buses"]},
+      {q:"one family → two …", a:["families"]},
+      {q:"one knife → two …", a:["knives"]},
+      {q:"one woman → two …", a:["women"]}
+     ]}
+  ],
+  reading:{
+    title:"One family, many languages",
+    paras:[
+      "My name is Leyla and I'm 34. I'm from Tashkent, but my family is very {international|международный}. My husband, Daniel, is British. He's an {engineer|инженер} and he's from Manchester. Our two children, Sam and Amira, are seven and five. They're {bilingual|двуязычные} – they speak English and Uzbek.",
+      "My parents live in Tashkent. My mother is Uzbek and my father is half Russian and half Korean, so at home they speak Russian. My brother, Timur, lives in Istanbul. His wife, Elif, is Turkish, and their daughter is one year old. She's my {favourite|любимая} niece – and my only niece!",
+      "Every summer, all the family meets in Tashkent. Fifteen people, five languages and one big table! The children's favourite word is 'plov' – it's the same in every language. Sometimes it's difficult because we all speak different languages, but we're very happy. Daniel says it's 'the best language class in the world'."
+    ],
+    ex:[
+      {type:"choice", id:"u1r1", title:"True or false?", ru:"Верно или неверно?", tf:true,
+       items:[
+        {q:"Leyla's husband is from Manchester.", o:["True","False"]},
+        {q:"Sam and Amira speak three languages.", o:["False","True"]},
+        {q:"Leyla's parents speak Russian at home.", o:["True","False"]},
+        {q:"Timur lives in Tashkent.", o:["False","True"]},
+        {q:"Leyla has two nieces.", o:["False","True"]},
+        {q:"The family meets every summer.", o:["True","False"]}
+       ]},
+      {type:"choice", id:"u1r2", title:"Answer the questions", ru:"Ответьте на вопросы по тексту.",
+       items:[
+        {q:"What is Daniel's job?", o:["He's an engineer.","He's a teacher.","He's a doctor."]},
+        {q:"How old is Amira?", o:["five","seven","one"]},
+        {q:"What nationality is Elif?", o:["Turkish","Uzbek","British"]},
+        {q:"How many people sit at the big table?", o:["fifteen","five","seven"]},
+        {q:"Why is it sometimes difficult?", o:["They speak different languages.","The table is small.","The children don't like plov."]}
+       ]},
+      {type:"type", id:"u1r3", title:"Find the word in the text", ru:"Найдите слово в тексте.",
+       items:[
+        {q:"a person who speaks two languages (paragraph 1)", a:["bilingual"]},
+        {q:"the daughter of your brother or sister (paragraph 2)", a:["niece"]},
+        {q:"the opposite of 'easy' (paragraph 3)", a:["difficult"]}
+       ]}
+    ]
+  },
+  grammar:[
+    {type:"choice", id:"u1g1", title:"to be · my / his / her / their · 's", ru:"Выберите правильный вариант.",
+     items:[
+      {q:"My brother ___ a doctor.", o:["is","are","am"]},
+      {q:"We ___ from Uzbekistan.", o:["are","is","am"]},
+      {q:"I ___ not married.", o:["am","is","are"]},
+      {q:"___ they your parents?", o:["Are","Is","Am"]},
+      {q:"A: Are you a teacher?  B: No, I ___ .", o:["'m not","isn't","aren't"]},
+      {q:"This is Anna and that is ___ husband, Tom.", o:["her","his","their"]},
+      {q:"My grandparents live in Bukhara. ___ house is very old.", o:["Their","They're","There"]},
+      {q:"Aziz is ___ brother. (= the brother of Kamola)", o:["Kamola's","Kamolas","Kamola"]},
+      {q:"Ali and Sara have two children. ___ names are Tim and Ella.", o:["Their","Her","Our"]},
+      {q:"The dog is in ___ bed.", o:["its","it's","it"]}
+     ]}
+  ],
+  writing:{
+    title:"A personal profile",
+    steps:[
+      {type:"caps", id:"u1w1", title:"Step 1 · Capital letters", ru:"Нажмите на слова, которые пишутся с большой буквы.",
+       tip:"Capital letters: names, cities, countries, nationalities, languages, days, months, the first word of a sentence and 'I'.",
+       text:"*my name is *aziza and *i am from *samarkand in *uzbekistan. *i speak *uzbek, *russian and a little *english. *i work in a hotel from *monday to *friday."}
+    ],
+    model:"<b>PROFILE: Daniel Brooks</b>\nMy name's Daniel Brooks. I'm British and I'm from Manchester, but I live in Tashkent with my wife and children. I'm an engineer at a big company. My skills are maths, design and working in a team. I speak English (fluent) and Uzbek (basic). I'm also a beginner in Russian. I want to join the course because I want to speak Uzbek with my family.",
+    task:"You want to join an English course. Write your personal profile for the course website.",
+    taskru:"Напишите о себе для сайта языкового курса.",
+    include:["your name and nationality","where you live","your job","your family","the languages you speak (fluent / basic / beginner)","why you want to learn English"],
+    min:60, max:80, checks:["count","capsI","capsStart"]
+  }
+},
+{
+  id:"u2", n:2, title:"My day", color:"#6A55B9", pages:"Coursebook pages 16–25",
+  topics:"Daily activities · Telling the time · Verb + preposition · Where you live",
+  vocab:[
+    {type:"flash", id:"u2v0", title:"Word bank", ru:"Нажмите на слово, чтобы увидеть перевод.",
+     words:[["get up","вставать"],["have a shower","принимать душ"],["have breakfast","завтракать"],["have lunch","обедать"],["have dinner","ужинать"],["go to bed","ложиться спать"],["see friends","встречаться с друзьями"],["always","всегда"],["usually","обычно"],["often","часто"],["sometimes","иногда"],["hardly ever","почти никогда"],["never","никогда"],["quarter past eight","четверть девятого"],["half past three","половина четвёртого"],["ten to seven","без десяти семь"],["wait for","ждать"],["agree with","соглашаться с"]]},
+    {type:"choice", id:"u2v1", title:"Which verb?", ru:"Какой глагол подходит?",
+     items:[
+      {q:"___ a shower", o:["have","go","make"]},
+      {q:"___ to bed", o:["go","have","watch"]},
+      {q:"___ TV", o:["watch","see","listen"]},
+      {q:"___ to music", o:["listen","hear","watch"]},
+      {q:"___ video games", o:["play","do","make"]},
+      {q:"___ friends", o:["see","watch","listen"]},
+      {q:"___ lunch", o:["have","go","play"]},
+      {q:"___ home", o:["go","have","watch"]},
+      {q:"___ up early", o:["get","go","have"]},
+      {q:"___ a book", o:["read","watch","listen"]}
+     ]},
+    {type:"order", id:"u2v2", title:"Kamila's day", ru:"Расставьте день Камилы по порядку. Смотрите на время!",
+     items:["get up – at quarter to seven","have a shower – at five past seven","have breakfast – at half past seven","go to work – at ten past eight","have lunch – at one o'clock","go home – at twenty to six","have dinner – at quarter past seven in the evening","go to bed – at eleven o'clock at night"]},
+    {type:"choice", id:"u2v3", title:"What time is it?", ru:"Который час? Посмотрите на часы.",
+     items:[
+      {clock:[8,15], q:"It's …", o:["quarter past eight","quarter to eight","quarter past three"]},
+      {clock:[3,30], q:"It's …", o:["half past three","half past six","three o'clock"]},
+      {clock:[6,50], q:"It's …", o:["ten to seven","ten past six","ten to six"]},
+      {clock:[9,25], q:"It's …", o:["twenty-five past nine","twenty-five to nine","five past nine"]},
+      {clock:[5,45], q:"It's …", o:["quarter to six","quarter past five","quarter to five"]},
+      {clock:[11,5], q:"It's …", o:["five past eleven","five to eleven","eleven o'clock"]},
+      {clock:[2,40], q:"It's …", o:["twenty to three","twenty past two","twenty to two"]},
+      {clock:[12,0], q:"It's …", o:["twelve o'clock","half past twelve","quarter past twelve"]}
+     ]},
+    {type:"choice", id:"u2v4", title:"Verb + preposition", ru:"Выберите правильный предлог.",
+     items:[
+      {q:"I always listen ___ music on the bus.", o:["to","for","at"]},
+      {q:"We're waiting ___ the bus.", o:["for","to","with"]},
+      {q:"I agree ___ you.", o:["with","to","for"]},
+      {q:"Can I pay ___ the coffee?", o:["for","to","at"]},
+      {q:"Please don't laugh ___ me!", o:["at","to","for"]},
+      {q:"He often talks ___ his mother on the phone.", o:["to","at","for"]},
+      {q:"I sometimes think ___ my future.", o:["about","for","at"]},
+      {q:"She asks ___ help when she doesn't understand.", o:["for","to","about"]}
+     ]}
+  ],
+  reading:{
+    title:"The night baker",
+    paras:[
+      "Rustam is 42 and he is a {baker|пекарь} in Samarkand. His day is very different from other people's day, because he works at night.",
+      "Rustam gets up at half past ten in the evening. He has a shower and drinks a big cup of black tea, but he doesn't have breakfast. He goes to work at quarter past eleven. The {bakery|пекарня} is near his home, so he always walks.",
+      "From midnight to six o'clock, Rustam and his {colleague|коллега}, Bekzod, make bread. They make about 600 round {non|узбекская лепёшка} every night! It is hard work and the room is very hot, but Rustam loves it. He often listens to music while he works.",
+      "At half past six in the morning, the first {customers|покупатели} arrive. Rustam goes home at eight o'clock. He has lunch – at nine in the morning! Then he goes to bed. He sleeps from ten to five.",
+      "'I hardly ever see my friends in the evening,' he says, 'but my bread makes people happy every morning.'"
+    ],
+    ex:[
+      {type:"choice", id:"u2r1", title:"True or false?", ru:"Верно или неверно?", tf:true,
+       items:[
+        {q:"Rustam works at night.", o:["True","False"]},
+        {q:"He has breakfast before work.", o:["False","True"]},
+        {q:"He goes to work by bus.", o:["False","True"]},
+        {q:"Rustam works alone.", o:["False","True"]},
+        {q:"He likes his job.", o:["True","False"]},
+        {q:"He often sees his friends in the evening.", o:["False","True"]}
+       ]},
+      {type:"order", id:"u2r2", title:"Rustam's day in order", ru:"Расставьте события по порядку.",
+       items:["He gets up.","He has a shower.","He walks to the bakery.","He makes bread with Bekzod.","He goes home.","He has lunch.","He goes to bed."]},
+      {type:"choice", id:"u2r3", title:"Answer the questions", ru:"Ответьте на вопросы по тексту.",
+       items:[
+        {q:"What does Rustam drink before work?", o:["black tea","coffee","milk"]},
+        {q:"How many non do they make every night?", o:["about 600","about 60","about 6,000"]},
+        {q:"When do the first customers arrive?", o:["at half past six","at midnight","at eight o'clock"]},
+        {q:"Why does Rustam like his job?", o:["His bread makes people happy.","He earns a lot of money.","He has a lot of free time."]}
+       ]}
+    ]
+  },
+  grammar:[
+    {type:"choice", id:"u2g1", title:"Present simple: + and –", ru:"Выберите правильную форму.",
+     items:[
+      {q:"My sister ___ in a bank.", o:["works","work","working"]},
+      {q:"He ___ TV in the morning.", o:["doesn't watch","don't watch","doesn't watches"]},
+      {q:"We ___ coffee in the evening.", o:["don't drink","doesn't drink","not drink"]},
+      {q:"She ___ her teeth twice a day.", o:["brushes","brushs","brush"]},
+      {q:"My son ___ his homework after dinner.", o:["does","do","dos"]},
+      {q:"My parents ___ in the city centre.", o:["don't live","doesn't live","not live"]}
+     ]},
+    {type:"choice", id:"u2g2", title:"Where does the adverb go?", ru:"Какое предложение правильное?",
+     items:[
+      {q:"Choose the correct sentence.", o:["I usually get up at seven.","I get usually up at seven.","I get up at seven usually always."]},
+      {q:"Choose the correct sentence.", o:["He is always tired.","He always is tired.","Always he is tired."]},
+      {q:"Choose the correct sentence.", o:["We hardly ever eat meat.","We eat hardly ever meat.","We hardly ever are eat meat."]},
+      {q:"Choose the correct sentence.", o:["She is never late.","She never is late.","She is late never."]}
+     ]},
+    {type:"build", id:"u2g3", title:"Make sentences", ru:"Нажимайте на слова, чтобы составить предложение.",
+     items:[
+      {w:["I","never","drink","coffee"], end:"."},
+      {w:["She","is","often","late"], end:"."},
+      {w:["My dad","usually","cooks","dinner"], end:"."},
+      {w:["They","don't","work","on Sundays"], end:"."}
+     ]}
+  ],
+  writing:{
+    title:"Describe where you live",
+    steps:[
+      {type:"choice", id:"u2w1", title:"Step 1 · and, but, or, because", ru:"Выберите правильный союз.",
+       tip:"<b>and</b> = similar ideas · <b>but</b> = different ideas · <b>or</b> = two possibilities · <b>because</b> = the reason (why?)",
+       items:[
+        {q:"Tashkent is big ___ busy.", o:["and","but","because"]},
+        {q:"I like my city, ___ the summer is very hot.", o:["but","and","or"]},
+        {q:"You can go by metro ___ by bus.", o:["or","because","but"]},
+        {q:"I love my street ___ it is very quiet.", o:["because","or","but"]},
+        {q:"There are lots of parks, ___ there isn't a cinema.", o:["but","and","or"]},
+        {q:"Tourists come here ___ the food is delicious.", o:["because","and","or"]}
+       ]}
+    ],
+    model:"I live in Bukhara. It's a small city in the west of Uzbekistan, <b>and</b> it's very old and beautiful. In summer there are lots of tourists, <b>but</b> in winter it's quiet. I love my city <b>because</b> the people are friendly and the food is great. You can walk to most places <b>or</b> take a taxi. The only bad thing is the weather – it's very hot in July!",
+    task:"Write a paragraph about the place where you live.",
+    taskru:"Напишите абзац о месте, где вы живёте.",
+    include:["the name of your city, town or village","good things about it","bad things about it","transport, food, people or things to do","and, but, or, because"],
+    min:60, max:80, checks:["count","and","but","or","because"]
+  }
+},
+{
+  id:"u3", n:3, title:"The world of work", color:"#16907F", pages:"Coursebook pages 26–35",
+  topics:"Jobs · Work words · The suffix -er · Questions · Emails",
+  vocab:[
+    {type:"flash", id:"u3v0", title:"Word bank", ru:"Нажмите на слово, чтобы увидеть перевод.",
+     words:[["chef","повар"],["cleaner","уборщик, уборщица"],["dentist","стоматолог"],["hairdresser","парикмахер"],["journalist","журналист"],["mechanic","автомеханик"],["nurse","медсестра, медбрат"],["pilot","пилот"],["colleague","коллега"],["salary","зарплата"],["earn","зарабатывать"],["manager / boss","начальник"],["work part-time","работать неполный день"],["work from home","работать из дома"],["retired","на пенсии"],["unemployed","безработный"],["uniform","форма"],["office","офис"]]},
+    {type:"choice", id:"u3v1", title:"Who am I?", ru:"Угадайте профессию.",
+     items:[
+      {q:"I cook food in a restaurant.", o:["chef","cleaner","pilot"]},
+      {q:"I fly planes.", o:["pilot","mechanic","journalist"]},
+      {q:"I look after your teeth.", o:["dentist","nurse","hairdresser"]},
+      {q:"I cut and wash people's hair.", o:["hairdresser","dentist","chef"]},
+      {q:"I repair cars.", o:["mechanic","musician","cleaner"]},
+      {q:"I write for newspapers and websites.", o:["journalist","photographer","pilot"]},
+      {q:"I help doctors and look after people in hospital.", o:["nurse","chef","businesswoman"]},
+      {q:"I take photos for magazines.", o:["photographer","journalist","musician"]},
+      {q:"I play music in concerts.", o:["musician","mechanic","dentist"]}
+     ]},
+    {type:"type", id:"u3v2", title:"Make a person: -er", ru:"Образуйте слово с суффиксом -er.",
+     tip:"teach → teacher · verb ending in -e: + r (dance → dancer) · short verb: vowel + consonant → double it (win → winner)",
+     items:[
+      {q:"paint → a …", a:["painter"]},
+      {q:"sing → a …", a:["singer"]},
+      {q:"write → a …", a:["writer"]},
+      {q:"drive → a …", a:["driver"]},
+      {q:"bake → a …", a:["baker"]},
+      {q:"run → a …", a:["runner"]},
+      {q:"win → the …", a:["winner"]},
+      {q:"begin → a …", a:["beginner"]},
+      {q:"manage → a …", a:["manager"]},
+      {q:"farm → a …", a:["farmer"]}
+     ]},
+    {type:"choice", id:"u3v3", title:"Work words", ru:"Выберите правильное слово.",
+     items:[
+      {q:"I don't go to an office. I work from ___ .", o:["home","house","flat"]},
+      {q:"My brother works for a big ___ .", o:["company","colleague","salary"]},
+      {q:"Nurses earn a small ___ , but their job is very important.", o:["salary","uniform","boss"]},
+      {q:"My grandfather is 70. He doesn't work now – he's ___ .", o:["retired","full-time","a colleague"]},
+      {q:"Police officers and pilots wear a ___ at work.", o:["uniform","salary","office"]},
+      {q:"I only work 20 hours a week. I work ___ .", o:["part-time","full-time","long hours"]},
+      {q:"My ___ are very friendly – we often have lunch together.", o:["colleagues","uniforms","salaries"]},
+      {q:"Doctors often work long ___ .", o:["hours","money","offices"]}
+     ]}
+  ],
+  reading:{
+    title:"Three unusual jobs",
+    paras:[
+      "<h4>1. Mia – ice cream taster, Italy</h4>Mia works for a big ice cream company in Bologna. Every morning she {tastes|пробует на вкус} about 30 new {flavours|вкусы} and writes notes about them. She doesn't eat breakfast before work because she wants her mouth to be 'clean'. 'People think my job is easy,' she says, 'but I can't eat a lot. I taste one small {spoon|ложка} and that's all!'",
+      "<h4>2. Kevin – golf ball diver, USA</h4>Kevin works outside – and under water! He {dives|ныряет} into {lakes|озёра} on golf courses and finds the balls that golfers lose. He finds about 3,000 balls a day. The water is dark and cold, and sometimes there are fish and snakes. He works for himself, so he doesn't have a boss.",
+      "<h4>3. Aigerim – video game tester, Kazakhstan</h4>Aigerim works from home part-time. She plays new video games before they are in the shops and looks for problems. 'I love games, but this is real work,' she says. 'Sometimes I play the same {level|уровень (в игре)} a hundred times!' She earns a good salary and she sometimes works at night."
+    ],
+    ex:[
+      {type:"choice", id:"u3r1", title:"Who …?", ru:"Кто это? Мия, Кевин или Айгерим?",
+       items:[
+        {q:"Who works from home?", o:["Aigerim","Mia","Kevin"]},
+        {q:"Who works outside?", o:["Kevin","Mia","Aigerim"]},
+        {q:"Who doesn't have a boss?", o:["Kevin","Mia","Aigerim"]},
+        {q:"Who doesn't have breakfast before work?", o:["Mia","Kevin","Aigerim"]},
+        {q:"Who sometimes works at night?", o:["Aigerim","Mia","Kevin"]},
+        {q:"Who works for a big company?", o:["Mia","Kevin","Aigerim"]},
+        {q:"Who sometimes sees animals at work?", o:["Kevin","Mia","Aigerim"]},
+        {q:"Who does the same thing many times?", o:["Aigerim","Kevin","Mia"]}
+       ]},
+      {type:"choice", id:"u3r2", title:"True or false?", ru:"Верно или неверно?", tf:true,
+       items:[
+        {q:"Mia eats a lot of ice cream every day.", o:["False","True"]},
+        {q:"Kevin finds about 3,000 golf balls a day.", o:["True","False"]},
+        {q:"Aigerim works full-time.", o:["False","True"]},
+        {q:"Aigerim thinks her job is real work.", o:["True","False"]}
+       ]}
+    ]
+  },
+  grammar:[
+    {type:"choice", id:"u3g1", title:"Do, does, is, are? Question words", ru:"Выберите правильный вариант.",
+     items:[
+      {q:"___ you like your job?", o:["Do","Does","Are"]},
+      {q:"___ she a nurse?", o:["Is","Does","Do"]},
+      {q:"___ your brother work at night?", o:["Does","Do","Is"]},
+      {q:"A: Does he play the piano?  B: Yes, he ___ .", o:["does","do","is"]},
+      {q:"___ do you live? – In Tashkent.", o:["Where","When","Who"]},
+      {q:"___ do you start work? – At nine o'clock.", o:["What time","Where","Who"]},
+      {q:"___ do you live with? – My parents.", o:["Who","What","Where"]},
+      {q:"___ do you check your emails? – Every hour.", o:["How often","What","Who"]},
+      {q:"___ do you want to learn English? – Because I want to travel.", o:["Why","What","How often"]}
+     ]},
+    {type:"build", id:"u3g2", title:"Make questions", ru:"Нажимайте на слова, чтобы составить вопрос.",
+     items:[
+      {w:["Where","do","you","work"], end:"?"},
+      {w:["What","does","your sister","do"], end:"?"},
+      {w:["Does","he","take","the bus"], end:"?"},
+      {w:["What time","do","you","get up"], end:"?"},
+      {w:["Are","you","a","student"], end:"?"}
+     ]}
+  ],
+  writing:{
+    title:"An email: opening and closing",
+    steps:[
+      {type:"choice", id:"u3w1", title:"Step 1 · Formal or informal?", ru:"Официально или неофициально?", tf:true,
+       tip:"<b>Formal</b> (a teacher, a hotel, a company): Dear Mr / Mrs …, · Dear Sir or Madam, · Yours sincerely,<br><b>Informal</b> (a friend, family): Hi …, · Hello …, · Love, · All the best,",
+       items:[
+        {q:"Dear Mr Karimov,", o:["Formal","Informal"]},
+        {q:"Hi Jamila,", o:["Informal","Formal"]},
+        {q:"Yours sincerely,", o:["Formal","Informal"]},
+        {q:"Love,", o:["Informal","Formal"]},
+        {q:"Dear Sir or Madam,", o:["Formal","Informal"]},
+        {q:"All the best,", o:["Informal","Formal"]}
+       ]},
+      {type:"choice", id:"u3w2", title:"Step 2 · Choose the best phrase", ru:"Выберите лучший вариант.",
+       items:[
+        {q:"An email to your teacher, Mrs Smith. Opening:", o:["Dear Mrs Smith,","Hi Smith!","Love,"]},
+        {q:"An email to your best friend. Closing:", o:["Love,","Yours sincerely,","Dear Anna,"]},
+        {q:"An email to a hotel. You don't know the name. Opening:", o:["Dear Sir or Madam,","Hi hotel,","Hello friend,"]},
+        {q:"An email to your manager. Closing:", o:["Best wishes,","Love,","See you, xx"]}
+       ]}
+    ],
+    model:"<b>Formal</b>\nDear Mr Rahimov,\nI'm writing about the evening English course in January. Could you send me some information about the price and the times, please? I work full-time, so I'm only free after six o'clock.\nMany thanks,\nYours sincerely,\nKamola Yusupova\n\n<b>Informal</b>\nHi Lola,\nHow are you? Are you free for lunch on Friday? There's a new café near my office and the food is great. We can meet at one o'clock. Let me know!\nAll the best,\nDilnoza",
+    task:"Choose ONE email and write it:\nA) Write to a colleague. Invite him / her for lunch. (informal)\nB) Write to a language school. Ask about a course. (formal)",
+    taskru:"Выберите одно письмо: A) пригласите коллегу на обед (неофициально) или B) спросите о курсе в языковой школе (официально).",
+    include:["an opening (Dear … / Hi …)","why you are writing","a question or a request (Could you …? / Are you free …?)","a closing (Yours sincerely, / All the best, …)","your name"],
+    min:50, max:70, checks:["count","opening","closing","question"]
+  }
+}
+];
+
+/* =========================================================
+   STATE
+   ========================================================= */
+const KEY="navElemHW_v1";
+let store={name:"",scores:{},drafts:{}};
+try{const s=JSON.parse(localStorage.getItem(KEY)); if(s) store=Object.assign(store,s);}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}}
+function setScore(id,got,total){store.scores[id]={got,total}; save(); updateScore(id);}
+
+const SECTIONS=[["vocab","Vocabulary"],["reading","Reading"],["grammar","Grammar"],["writing","Writing"]];
+let view={unit:null,tab:"vocab"};
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+const $=s=>document.querySelector(s);
+function el(tag,attrs={},html=""){const e=document.createElement(tag);for(const k in attrs){if(k==="class")e.className=attrs[k];else if(k.startsWith("on"))e[k]=attrs[k];else e.setAttribute(k,attrs[k]);}if(html)e.innerHTML=html;return e;}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function toast(t){const x=$("#toast");x.textContent=t;x.classList.add("show");clearTimeout(x._t);x._t=setTimeout(()=>x.classList.remove("show"),1600);}
+function norm(s){return s.toLowerCase().replace(/[’']/g,"'").replace(/\s+/g," ").trim();}
+function allExercises(u){
+  const list=[...u.vocab,...u.reading.ex,...u.grammar,...u.writing.steps];
+  return list.filter(e=>e.type!=="flash");
+}
+function unitProgress(u){
+  const ex=allExercises(u); let done=0,got=0,tot=0;
+  ex.forEach(e=>{const s=store.scores[e.id]; if(s){done++;got+=s.got;tot+=s.total;}});
+  const w=store.drafts[u.id]&&store.drafts[u.id].sent?1:0;
+  return {done:done+w,all:ex.length+1,pct:Math.round((done+w)/(ex.length+1)*100),got,tot};
+}
+
+function cardShell(ex,count){
+  const c=el("div",{class:"card",id:"card-"+ex.id});
+  const h=el("h3",{},ex.title);
+  if(count){const sc=el("span",{class:"score",id:"score-"+ex.id});h.prepend(sc);}
+  c.append(h);
+  if(ex.ru)c.append(el("div",{class:"ru"},ex.ru));
+  if(ex.tip)c.append(el("div",{class:"tip-box"},ex.tip));
+  return c;
+}
+function updateScore(id){
+  const s=store.scores[id], b=document.getElementById("score-"+id);
+  if(!b)return;
+  if(s){b.textContent=s.got+" / "+s.total;b.classList.add("done");}else{b.textContent="";b.classList.remove("done");}
+}
+function finishMsg(got,total){
+  const p=got/total;
+  return p===1?"Excellent! 🌟":p>=.8?"Very good! 👍":p>=.5?"Good. Try again for a better score.":"Keep practising – try again!";
+}
+function resetBtn(ex,container,renderFn){
+  return el("button",{class:"small",onclick:()=>{delete store.scores[ex.id];save();const n=renderFn(ex);container.replaceWith(n);updateScore(ex.id);}},"↺ Try again");
+}
+
+/* =========================================================
+   CLOCK
+   ========================================================= */
+function clockSVG(h,m){
+  const cx=60,cy=60;
+  const ma=(m/60)*2*Math.PI, ha=((h%12)+m/60)/12*2*Math.PI;
+  const hand=(a,len,w,c)=>`<line x1="${cx}" y1="${cy}" x2="${cx+len*Math.sin(a)}" y2="${cy-len*Math.cos(a)}" stroke="${c}" stroke-width="${w}" stroke-linecap="round"/>`;
+  let ticks="";
+  for(let i=1;i<=12;i++){const a=i/12*2*Math.PI;ticks+=`<text x="${cx+43*Math.sin(a)}" y="${cy-43*Math.cos(a)+5}" font-size="13" font-weight="700" text-anchor="middle" fill="#1E2433">${i}</text>`;}
+  return `<svg class="svgclock" width="120" height="120" viewBox="0 0 120 120" role="img" aria-label="clock"><circle cx="60" cy="60" r="56" fill="#fff" stroke="var(--accent)" stroke-width="4"/>${ticks}${hand(ha,26,6,"#1E2433")}${hand(ma,40,3.5,"var(--accent)")}<circle cx="60" cy="60" r="4" fill="#1E2433"/></svg>`;
+}
+
+/* =========================================================
+   EXERCISE RENDERERS
+   ========================================================= */
+function renderFlash(ex){
+  const c=cardShell(ex,false), g=el("div",{class:"flash"});
+  ex.words.forEach(([en,ru])=>{
+    const b=el("button",{class:"fc"},`<span class="front">${en}</span><span class="back2">${ru}</span>`);
+    b.onclick=()=>b.classList.toggle("flip");
+    g.append(b);
+  });
+  c.append(g);return c;
+}
+
+function renderChoice(ex){
+  const c=cardShell(ex,true); let firstTry=0,answered=0; const n=ex.items.length;
+  ex.items.forEach((it,i)=>{
+    const row=el("div",{class:"item"});
+    if(it.clock)row.innerHTML=clockSVG(it.clock[0],it.clock[1]);
+    row.append(el("div",{class:"q"},`<span class="num">${i+1}</span>${it.q.replace("___","<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>")}`));
+    const opts=el("div",{class:"opts"}); let wrong=false;
+    const order=ex.tf?it.o.slice().sort((a,b)=>a==="True"||a==="Formal"?-1:1):shuffle(it.o);
+    order.forEach(o=>{
+      const b=el("button",{class:"opt"},o);
+      b.onclick=()=>{
+        if(o===it.o[0]){
+          b.classList.add("ok"); opts.querySelectorAll("button").forEach(x=>x.disabled=true);
+          if(!wrong)firstTry++; answered++;
+          if(answered===n){setScore(ex.id,firstTry,n);c.append(el("div",{class:"fb ok"},finishMsg(firstTry,n)),resetBtn(ex,c,renderChoice));}
+        }else{wrong=true;b.classList.remove("bad");void b.offsetWidth;b.classList.add("bad");}
+      };
+      opts.append(b);
+    });
+    row.append(opts);c.append(row);
+  });
+  setTimeout(()=>updateScore(ex.id));
+  return c;
+}
+
+function renderMatch(ex){
+  const c=cardShell(ex,true); let round=0,mistakes=0;
+  const total=ex.rounds.reduce((a,r)=>a+r.length,0);
+  const box=el("div"); c.append(box);
+  function draw(){
+    box.innerHTML="";
+    const pairs=ex.rounds[round]; let left=null,leftBtn=null,matched=0;
+    box.append(el("div",{class:"pages"},`Round ${round+1} of ${ex.rounds.length}`));
+    const grid=el("div",{class:"match"}),L=el("div",{class:"col"}),R=el("div",{class:"col"});
+    shuffle(pairs).forEach(p=>{const b=el("button",{class:"mbtn"},p[0]);b.onclick=()=>{if(b.classList.contains("ok"))return;L.querySelectorAll(".sel").forEach(x=>x.classList.remove("sel"));b.classList.add("sel");left=p;leftBtn=b;};L.append(b);});
+    shuffle(pairs).forEach(p=>{const b=el("button",{class:"mbtn"},p[1]);b.onclick=()=>{
+      if(b.classList.contains("ok"))return;
+      if(!left){toast("First tap a word on the left");return;}
+      if(left[1]===p[1]){b.classList.add("ok");leftBtn.classList.remove("sel");leftBtn.classList.add("ok");left=null;matched++;
+        if(matched===pairs.length){round++; if(round<ex.rounds.length)setTimeout(draw,500); else {const got=Math.max(0,total-mistakes);setScore(ex.id,got,total);box.append(el("div",{class:"fb ok"},finishMsg(got,total)),resetBtn(ex,c,renderMatch));}}
+      }else{mistakes++;b.classList.remove("bad");void b.offsetWidth;b.classList.add("bad");}
+    };R.append(b);});
+    grid.append(L,R);box.append(grid);
+  }
+  draw(); setTimeout(()=>updateScore(ex.id)); return c;
+}
+
+function renderType(ex){
+  const c=cardShell(ex,true); let firstTry=0,answered=0; const n=ex.items.length;
+  ex.items.forEach((it,i)=>{
+    const row=el("div",{class:"item"});
+    row.append(el("div",{class:"q"},`<span class="num">${i+1}</span>${it.q}`));
+    const tr=el("div",{class:"typerow"}), inp=el("input",{type:"text",autocapitalize:"off",autocomplete:"off",spellcheck:"false"});
+    const chk=el("button",{class:"small"},"Check"), hint=el("button",{class:"small"},"Hint"), fb=el("div",{class:"fb"});
+    let wrong=false,done=false;
+    const check=()=>{
+      if(done)return; const v=norm(inp.value); if(!v)return;
+      if(it.a.map(norm).includes(v)){done=true;inp.className="ok";inp.disabled=true;chk.remove();hint.remove();fb.className="fb ok";fb.textContent="✓ Correct!";if(!wrong)firstTry++;answered++;
+        if(answered===n){setScore(ex.id,firstTry,n);c.append(el("div",{class:"fb ok"},finishMsg(firstTry,n)),resetBtn(ex,c,renderType));}}
+      else{wrong=true;inp.className="bad";fb.className="fb bad";fb.textContent="Not quite – try again or tap Hint.";}
+    };
+    chk.onclick=check; inp.onkeydown=e=>{if(e.key==="Enter")check();};
+    hint.onclick=()=>{wrong=true;const a=it.a[0];fb.className="fb";fb.textContent="Starts with: "+a.slice(0,Math.ceil(a.length/2))+"…";};
+    tr.append(inp,chk,hint);row.append(tr,fb);c.append(row);
+  });
+  setTimeout(()=>updateScore(ex.id)); return c;
+}
+
+function renderOrder(ex){
+  const c=cardShell(ex,true); let next=0,mistakes=0; const n=ex.items.length;
+  const list=el("ol",{class:"orderlist"}), chips=el("div",{class:"chips"});
+  c.append(el("div",{class:"pages"},"Tap the first one, then the next …"),list,chips);
+  shuffle(ex.items).forEach(t=>{
+    const b=el("button",{class:"chip"},t);
+    b.onclick=()=>{
+      if(t===ex.items[next]){b.classList.add("used");list.append(el("li",{},t));next++;
+        if(next===n){const got=Math.max(0,n-mistakes);setScore(ex.id,got,n);c.append(el("div",{class:"fb ok"},finishMsg(got,n)),resetBtn(ex,c,renderOrder));}}
+      else{mistakes++;b.classList.remove("bad");void b.offsetWidth;b.classList.add("bad");}
+    };
+    chips.append(b);
+  });
+  setTimeout(()=>updateScore(ex.id)); return c;
+}
+
+function renderBuild(ex){
+  const c=cardShell(ex,true); let firstTry=0,answered=0; const n=ex.items.length;
+  ex.items.forEach((it,i)=>{
+    const row=el("div",{class:"item"}), line=el("div",{class:"answerline"}), chips=el("div",{class:"chips"}), fb=el("div",{class:"fb"});
+    row.append(el("div",{class:"q"},`<span class="num">${i+1}</span>`));
+    let picked=[],wrong=false,done=false;
+    const chk=el("button",{class:"small"},"Check");
+    let words=shuffle(it.w); if(words.join()===it.w.join())words=words.slice(1).concat(words[0]);
+    words.forEach(w=>{
+      const b=el("button",{class:"chip"},w);
+      b.onclick=()=>{ if(done)return; b.classList.add("used"); picked.push(w);
+        const p=el("button",{class:"chip"},w); p.onclick=()=>{if(done)return;picked.splice(picked.indexOf(w),1);p.remove();b.classList.remove("used");}; line.append(p);};
+      chips.append(b);
+    });
+    chk.onclick=()=>{
+      if(done)return;
+      if(picked.length<it.w.length){fb.className="fb bad";fb.textContent="Use all the words.";return;}
+      if(picked.join(" ")===it.w.join(" ")){done=true;line.querySelectorAll(".chip").forEach(x=>x.classList.add("ok"));line.append(el("b",{},it.end));chk.remove();fb.className="fb ok";fb.textContent="✓ Correct!";if(!wrong)firstTry++;answered++;
+        if(answered===n){setScore(ex.id,firstTry,n);c.append(el("div",{class:"fb ok"},finishMsg(firstTry,n)),resetBtn(ex,c,renderBuild));}}
+      else{wrong=true;fb.className="fb bad";fb.textContent="Check the word order. Tap a word in the line to move it back.";}
+    };
+    row.append(line,chips,el("div",{style:"margin-top:8px"}),fb);row.lastChild.before(chk);c.append(row);
+  });
+  setTimeout(()=>updateScore(ex.id)); return c;
+}
+
+function renderCaps(ex){
+  const c=cardShell(ex,true); const box=el("div",{class:"caps"}); const toks=[];
+  ex.text.split(" ").forEach(raw=>{
+    const need=raw.startsWith("*"); const w=need?raw.slice(1):raw;
+    const m=w.match(/^([A-Za-z']+)(.*)$/); const core=m?m[1]:w, tail=m?m[2]:"";
+    const b=el("button",{class:"cw"},core); const t={b,need,core,sel:false};
+    b.onclick=()=>{if(c._done)return;t.sel=!t.sel;b.classList.toggle("sel");b.textContent=t.sel?core[0].toUpperCase()+core.slice(1):core;};
+    toks.push(t); box.append(b); if(tail)box.append(document.createTextNode(tail)); box.append(document.createTextNode(" "));
+  });
+  const fb=el("div",{class:"fb"}), chk=el("button",{class:"btn"},"Check"); let first=null;
+  chk.onclick=()=>{
+    const needN=toks.filter(t=>t.need).length; let right=0,extra=0;
+    toks.forEach(t=>{t.b.classList.remove("ok","miss","bad");
+      if(t.need&&t.sel){t.b.classList.add("ok");right++;}
+      else if(t.need&&!t.sel){t.b.classList.add("miss");}
+      else if(!t.need&&t.sel){t.b.classList.add("bad");extra++;}});
+    const got=Math.max(0,right-extra); if(first===null)first=got;
+    if(right===needN&&!extra){fb.className="fb ok";fb.textContent="✓ Perfect! All "+needN+" capital letters are correct.";c._done=true;chk.remove();setScore(ex.id,first,needN);c.append(el("div",{class:"fb ok"},finishMsg(first,needN)),resetBtn(ex,c,renderCaps));}
+    else{fb.className="fb bad";fb.textContent=`You found ${right} of ${needN}. Yellow = missing, red = no capital here. Fix them and check again.`;}
+  };
+  c.append(box,el("div",{style:"height:10px"}),chk,fb);
+  setTimeout(()=>updateScore(ex.id)); return c;
+}
+
+const RENDER={flash:renderFlash,choice:renderChoice,match:renderMatch,type:renderType,order:renderOrder,build:renderBuild,caps:renderCaps};
+
+/* =========================================================
+   READING & WRITING
+   ========================================================= */
+function renderReadingText(r){
+  const c=el("div",{class:"card text"});
+  c.append(el("h3",{style:"font-size:22px;margin-bottom:4px"},r.title));
+  c.append(el("div",{class:"ru",style:"margin-bottom:14px"},"Прочитайте текст. Нажмите на подчёркнутые слова, чтобы увидеть перевод."));
+  r.paras.forEach(p=>{
+    const html=p.replace(/\{([^|}]+)\|([^}]+)\}/g,(m,w,ru)=>`<button class="gl" data-ru="${ru}">${w}</button>`);
+    const para=el("p",{},html); c.append(para);
+  });
+  c.querySelectorAll(".gl").forEach(b=>b.onclick=()=>{
+    const nx=b.nextSibling; if(nx&&nx.classList&&nx.classList.contains("tip")){nx.remove();return;}
+    b.after(el("span",{class:"tip"},b.dataset.ru));
+  });
+  return c;
+}
+
+const CHECKS={
+  count:(t,w)=>({label:`${w.min}–${w.max} words`,ok:wc(t)>=w.min&&wc(t)<=w.max}),
+  capsI:t=>({label:"'I' is always a capital letter",ok:t.trim().length>0&&!/(^|[^A-Za-z'])i([^A-Za-z]|$)/.test(t)}),
+  capsStart:t=>({label:"Every sentence starts with a capital letter",ok:t.trim().length>0&&!/(^\s*[a-z])|([.!?]\s+[a-z])/.test(t)}),
+  and:t=>({label:"uses and",ok:/\band\b/i.test(t)}),
+  but:t=>({label:"uses but",ok:/\bbut\b/i.test(t)}),
+  or:t=>({label:"uses or",ok:/\bor\b/i.test(t)}),
+  because:t=>({label:"uses because",ok:/\bbecause\b/i.test(t)}),
+  opening:t=>({label:"has an opening (Dear … / Hi … / Hello …)",ok:/^\s*(dear|hi|hello)\b/i.test(t)}),
+  closing:t=>({label:"has a closing (Yours sincerely / Best wishes / Regards / All the best / Love)",ok:/(yours sincerely|yours faithfully|best wishes|regards|all the best|love,|see you)/i.test(t)}),
+  question:t=>({label:"has a question or a request (?)",ok:/\?/.test(t)})
+};
+function wc(t){const m=t.trim().match(/[A-Za-zА-Яа-яЁё0-9'’-]+/g);return m?m.length:0;}
+
+function renderWriting(u){
+  const w=u.writing, frag=document.createDocumentFragment();
+  w.steps.forEach(s=>frag.append(RENDER[s.type](s)));
+  const c=el("div",{class:"card"});
+  c.append(el("h3",{},`Step ${w.steps.length+1} · Read the model`));
+  c.append(el("div",{class:"ru"},"Прочитайте пример."));
+  c.append(el("div",{class:"model"},w.model));
+  frag.append(c);
+
+  const t=el("div",{class:"card"});
+  t.append(el("h3",{},`Step ${w.steps.length+2} · Your turn ✍️`));
+  t.append(el("div",{class:"ru"},w.taskru));
+  t.append(el("p",{style:"white-space:pre-line;font-weight:700;margin:0 0 8px"},w.task));
+  t.append(el("div",{class:"tip-box"},"<b>Include:</b> "+w.include.join(" · ")));
+  const ta=el("textarea",{placeholder:"Write here…"});
+  const d=store.drafts[u.id]; if(d)ta.value=d.text||"";
+  const info=el("div",{style:"margin-top:6px"});
+  const checks=el("ul",{class:"checks"});
+  const upd=()=>{
+    const n=wc(ta.value);
+    info.innerHTML=`<span class="wc">${n}</span> words <span class="pages">(target ${w.min}–${w.max})</span>`;
+    checks.innerHTML="";
+    w.checks.forEach(k=>{const r=CHECKS[k](ta.value,w);checks.append(el("li",{class:r.ok?"on":""},r.label));});
+    store.drafts[u.id]=Object.assign(store.drafts[u.id]||{}, {text:ta.value}); save();
+  };
+  ta.oninput=upd;
+  const copy=el("button",{class:"btn"},"📋 Copy and send to my teacher");
+  copy.onclick=()=>{
+    if(wc(ta.value)<10){toast("Write your text first");return;}
+    const ex=allExercises(u).map(e=>{const s=store.scores[e.id];return s?`${e.title}: ${s.got}/${s.total}`:null;}).filter(Boolean);
+    const msg=`Navigate Elementary – Unit ${u.n} homework\nName: ${store.name||"—"}\n\nWriting: ${w.title}\n${ta.value.trim()}\n\n(${wc(ta.value)} words)\n\nScores:\n${ex.join("\n")||"—"}`;
+    const done=()=>{store.drafts[u.id].sent=true;save();toast("Copied! Paste it in Telegram to your teacher.");};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(msg).then(done,()=>fallbackCopy(msg,done));}else fallbackCopy(msg,done);
+  };
+  t.append(ta,info,checks,copy);
+  t.append(el("div",{class:"pages",style:"margin-top:8px"},"Your text is saved on this device. The button copies your text and your scores – then paste them in a message to your teacher."));
+  frag.append(t); setTimeout(upd);
+  return frag;
+}
+function fallbackCopy(txt,cb){const a=el("textarea");a.value=txt;document.body.append(a);a.select();try{document.execCommand("copy");cb();}catch(e){toast("Please select and copy the text");}a.remove();}
+
+/* =========================================================
+   PAGES
+   ========================================================= */
+function setAccent(col){document.documentElement.style.setProperty("--accent",col);document.documentElement.style.setProperty("--accentbg",col+"1A");}
+
+function home(){
+  setAccent("#2F6FD6"); view.unit=null;
+  const app=$("#app"); app.innerHTML="";
+  const h=el("header",{class:"top"}); const hw=el("div",{class:"wrap"});
+  hw.append(el("h1",{},"Navigate Elementary · Homework"),el("p",{},"A2 · Vocabulary, reading, grammar and writing"));
+  h.append(hw); app.append(h);
+  const w=el("div",{class:"wrap"});
+  const nb=el("div",{class:"namebox"}); nb.append(el("label",{for:"nm"},"Your name / Ваше имя"));
+  const inp=el("input",{id:"nm",placeholder:"Write your name"}); inp.value=store.name; inp.oninput=()=>{store.name=inp.value;save();};
+  nb.append(inp); w.append(nb);
+  UNITS.forEach(u=>{
+    const p=unitProgress(u);
+    const b=el("button",{class:"unitcard",style:`--c:${u.color}`});
+    b.innerHTML=`<div class="n">Unit ${u.n}</div><h2>${u.title}</h2><div class="topics">${u.topics}</div><div class="bar"><i style="width:${p.pct}%"></i></div><div class="barlabel">${p.done} of ${p.all} tasks done</div>`;
+    b.onclick=()=>{location.hash=u.id+"/vocab";};
+    w.append(b);
+  });
+  w.append(el("footer",{},"Homework based on Navigate Elementary A2 (Oxford) · Teacher: Shirin Ishbekova"));
+  app.append(w); window.scrollTo(0,0);
+}
+
+function unitPage(u,tab){
+  setAccent(u.color); view={unit:u,tab};
+  const app=$("#app"); app.innerHTML="";
+  const h=el("header",{class:"top"}); const hw=el("div",{class:"wrap"});
+  const back=el("button",{class:"back"},"← All units"); back.onclick=()=>{location.hash="";};
+  hw.append(back,el("h1",{},`Unit ${u.n} · ${u.title}`),el("p",{},u.pages));
+  h.append(hw); app.append(h);
+  const w=el("div",{class:"wrap"});
+  const tabs=el("div",{class:"tabs"});
+  SECTIONS.forEach(([k,label],i)=>{
+    const b=el("button",{class:"tab"+(k===tab?" on":"")},label);
+    b.onclick=()=>{location.hash=u.id+"/"+k;};
+    tabs.append(b);
+  });
+  w.append(tabs);
+  const body=el("div");
+  if(tab==="vocab") u.vocab.forEach(ex=>body.append(RENDER[ex.type](ex)));
+  if(tab==="reading"){body.append(renderReadingText(u.reading)); u.reading.ex.forEach(ex=>body.append(RENDER[ex.type](ex)));}
+  if(tab==="grammar") u.grammar.forEach(ex=>body.append(RENDER[ex.type](ex)));
+  if(tab==="writing"){body.append(el("h2",{style:"margin:10px 0 0"},u.writing.title)); body.append(renderWriting(u));}
+  w.append(body);
+  const idx=SECTIONS.findIndex(s=>s[0]===tab);
+  if(idx<SECTIONS.length-1){const nx=el("button",{class:"btn",style:"width:100%;margin-top:6px"},`Next: ${SECTIONS[idx+1][1]} →`);nx.onclick=()=>{location.hash=u.id+"/"+SECTIONS[idx+1][0];};w.append(nx);}
+  else {const nx=el("button",{class:"btn ghost",style:"width:100%;margin-top:6px"},"← Back to all units");nx.onclick=()=>{location.hash="";};w.append(nx);}
+  w.append(el("footer",{},"Homework based on Navigate Elementary A2 (Oxford) · Teacher: Shirin Ishbekova"));
+  app.append(w); window.scrollTo(0,0);
+}
+
+function route(){
+  const [uid,tab]=location.hash.slice(1).split("/");
+  const u=UNITS.find(x=>x.id===uid);
+  if(u) unitPage(u,SECTIONS.some(s=>s[0]===tab)?tab:"vocab"); else home();
+}
+window.addEventListener("hashchange",route);
+route();
+</script>
+</body>
+</html>
